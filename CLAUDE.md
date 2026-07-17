@@ -3,11 +3,18 @@
 Full spec: [docs/spec.md](docs/spec.md). Read it before making architectural
 decisions — this file is conventions and guardrails, not the spec itself.
 
-**Current status: Phase 1 (scaffold) complete.** Empty nav shell across all
-five sections, MUI/tokens wired, Supabase auth (sign in/up/out) wired but
-needs real project credentials to actually authenticate, lint/typecheck/unit
-tests/e2e/build all green. Phase 2 (one section end-to-end) is next — see
-"Build sequencing" below.
+**Current status: Phase 2 (one section end-to-end) complete.** Tech Questions
+is a real, working feature: picker (tech + curated version) → server action
+calls Sonnet 5 with web search enabled → generated scenario question →
+user answer → server action scores Correctness + Communication → feedback
+displayed. Gated behind Supabase auth, which is itself gated by an
+`ALLOWED_EMAILS` allowlist (`src/lib/auth-allowlist.ts`) restricting sign-in/up
+to specific addresses while this stays pre-launch. Verified end-to-end with a
+real Claude API call — confirmed the model actually uses web search and
+returns parseable output, not just that the code compiles. Real Supabase +
+Anthropic credentials are live in `.env.local`.
+Phase 3 (generalize into the shared engine, extend to the other three
+non-company sections) is next — see "Build sequencing" below.
 
 ## Stack
 
@@ -37,10 +44,18 @@ pnpm test:watch    # vitest, watch mode
 pnpm test:e2e      # playwright (builds + starts the app itself)
 ```
 
-Copy `.env.example` to `.env.local` and fill in a real Supabase project's URL
-and anon key to exercise auth locally. Without it, the app still runs — auth
-routes degrade to a "not configured" notice rather than crashing (see
-`src/lib/supabase/env.ts`).
+Copy `.env.example` to `.env.local` and fill in real values to exercise auth
+and generation locally:
+
+- `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase
+  project settings. Without these, auth degrades to a "not configured" notice
+  rather than crashing (see `src/lib/supabase/env.ts`).
+- `ANTHROPIC_API_KEY` — console.anthropic.com → Settings → API Keys.
+  Server-side only; without it, generation calls throw a clear configuration
+  error rather than a raw SDK error (see `src/lib/anthropic/client.ts`).
+- `ALLOWED_EMAILS` — comma-separated allowlist gating sign-in/up while
+  pre-launch (see `src/lib/auth-allowlist.ts`). Leave unset to open sign-up to
+  anyone.
 
 This list is authoritative — check `package.json` scripts before running
 anything not listed here, and update this list the moment scripts are added
@@ -123,15 +138,15 @@ version-aware prompt pattern, the code-review feedback rubric.
 3. ~~Phase 1 — scaffold~~ (done): Next.js/TS/MUI/tokens, nav shell across all
    five section routes, Vitest+RTL, Playwright, Supabase auth wiring,
    `frontend-design`/`skill-creator`/`webapp-testing` skills installed.
-4. **Phase 2 — one section end-to-end (next)**: build the General Tech
-   Questions section fully, using it as the walking skeleton for the
-   generation/feedback loop (picker → server-side Sonnet 5 call → structured
-   question → user answer → feedback call scored on Correctness +
-   Communication). See spec for why this section first.
-5. Phase 3 — generalize into the shared generation/feedback engine; author
-   the version-aware prompt pattern, difficulty rubric, and code-review
-   rubric project skills; extend to Coding Exercises (no live execution yet),
-   Code Review, and Behavioural.
+4. ~~Phase 2 — one section end-to-end~~ (done): Tech Questions is a real
+   working feature — picker → server-side Sonnet 5 call (web search enabled)
+   → generated question → user answer → feedback call scored on Correctness +
+   Communication. Gated behind Supabase auth + an `ALLOWED_EMAILS` allowlist.
+   Verified with a real API call, not just compiled.
+5. **Phase 3 (next)** — generalize into the shared generation/feedback
+   engine; author the version-aware prompt pattern, difficulty rubric, and
+   code-review rubric project skills; extend to Coding Exercises (no live
+   execution yet), Code Review, and Behavioural.
 6. Phase 4 — company section: job-spec parsing, web-search research, the
    shared company context object, wired into all four generators.
 7. Phase 5 — live coding: CodeMirror 6 + Web Worker sandbox upgrade for the

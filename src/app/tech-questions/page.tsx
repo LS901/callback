@@ -1,5 +1,12 @@
-import { SectionPlaceholder } from '@/components/SectionPlaceholder';
+import { redirect } from 'next/navigation';
+import { getCurrentUser } from '@/lib/supabase/server';
+import { TechQuestionsClient } from './TechQuestionsClient';
 
-export default function TechQuestionsPage() {
-  return <SectionPlaceholder slug="tech-questions" />;
+export default async function TechQuestionsPage() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect('/login');
+  }
+
+  return <TechQuestionsClient />;
 }
