@@ -14,6 +14,7 @@ export type GeneratedQuestion = {
 export type Feedback = {
   correctness: string;
   communication: string;
+  modelAnswer: string;
 };
 
 async function requireUser() {
@@ -84,10 +85,12 @@ Score the answer on exactly two dimensions:
 
 Do not hedge ("it depends", "there are many ways to think about this") unless immediately followed by the concrete answer for this specific case.
 
+Also provide a model answer: a strong reference answer to the question, correct for ${tech.label} ${version} specifically. If the question is code-shaped (a bugfix, API usage, a refactor), include a code sample — use a fenced code block with a language tag (e.g. \`\`\`tsx) inside the "modelAnswer" string, not just prose. Escape newlines and other control characters properly so the field is valid JSON.
+
 Respond with exactly one fenced code block containing JSON in this exact shape, and nothing else:
 
 \`\`\`json
-{"correctness": "...", "communication": "..."}
+{"correctness": "...", "communication": "...", "modelAnswer": "..."}
 \`\`\``;
 
   const userContent = `Question: ${question.question}\nScenario: ${question.scenario}\nCandidate's answer: ${answer}`;

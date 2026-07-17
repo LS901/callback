@@ -15,6 +15,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { techOptions } from '@/lib/tech-options';
+import { CodeAwareText } from '@/components/CodeAwareText';
 import {
   generateQuestion,
   generateFeedback,
@@ -198,6 +199,14 @@ export function TechQuestionsClient() {
                 Communication
               </Typography>
               <Typography variant="body1">{feedback.communication}</Typography>
+            </CardContent>
+          </Card>
+          <Card variant="outlined">
+            <CardContent>
+              <Typography variant="subtitle1" gutterBottom>
+                Model answer
+              </Typography>
+              <CodeAwareText text={feedback.modelAnswer} />
             </CardContent>
           </Card>
           <Button variant="contained" onClick={handleReset}>

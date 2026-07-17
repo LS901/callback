@@ -38,4 +38,21 @@ describe('extractJson', () => {
 
     expect(() => extractJson(text)).toThrow('The model returned malformed output.');
   });
+
+  it('does not truncate at a nested code fence inside a JSON string value', () => {
+    // The model answer field can legitimately contain its own ```tsx fence —
+    // a naive non-greedy match would stop at that inner closing ``` instead
+    // of the outer block's real closing fence.
+    const modelAnswer =
+      'Use a functional update:\\n\\n```tsx\\nsetCount((c) => c + 1);\\n```\\n\\nThis avoids stale closures.';
+    const text = [
+      '```json',
+      `{"correctness": "Close.", "communication": "Clear.", "modelAnswer": "${modelAnswer}"}`,
+      '```',
+    ].join('\n');
+
+    expect(extractJson<{ modelAnswer: string }>(text).modelAnswer).toContain(
+      'setCount((c) => c + 1);',
+    );
+  });
 });
