@@ -1,8 +1,8 @@
 # Interview Prep Platform — v1 Spec
 
-Status: **draft, pending approval**. Locked via interview on 2026-07-16. Nothing in
-this document should be treated as a build order until the user has signed off
-on it — see `CLAUDE.md` for the phased-plan gate.
+Status: **approved 2026-07-16.** Phase 1 (scaffold) and Phase 2 (Tech
+Questions, end-to-end) are built and verified — see `CLAUDE.md` for current
+build status and the phased-plan gate for what's next.
 
 ## 1. What it is
 
@@ -70,6 +70,21 @@ reason from official docs/changelogs for that specific version rather than
 producing version-agnostic output. React 19 and React 17 are different
 contexts, never merged into one "React" bucket.
 
+**Version-aware is not version-exclusive.** Learned the hard way during Phase
+2: instructing the model that a question "must have a different correct
+answer" for the selected version collapses the question space down to
+version-diff trivia, and a single stateless call reliably re-anchors on
+the single most famous delta for that version (e.g. React 19 always
+producing a `forwardRef`-removal question) rather than varying. The correct
+behavior is the full breadth of important concepts for that
+language/framework, answered and framed correctly for the selected version —
+version-specific features are one flavor among many, not the only kind of
+question generated. Where this matters (deciding how often to center a
+question on a version-specific feature vs. a general concept), decide the mix
+server-side before the call rather than leaving it to the model's judgment in
+a single stateless request — a soft "sometimes" instruction is not reliable
+steering on its own.
+
 ## 4. Feedback rubric (coding + code-review sections)
 
 v1 scores against two dimensions:
@@ -78,6 +93,17 @@ v1 scores against two dimensions:
   user's review actually catch the real bugs.
 - **Communication / reasoning clarity** — particularly for code review: did
   the user explain _why_ something is a problem, not just flag it.
+
+**Every feedback response includes a model answer**, across all four
+non-company modes, not just coding/code-review. Alongside the Correctness +
+Communication scoring of the user's own answer, generate a concrete reference
+answer for what a strong response looks like — including a code sample when
+the question is code-shaped (e.g. a bugfix, an API usage question, a
+refactor), not just prose. This gives the user something concrete to compare
+their own answer against, rather than only abstract commentary on what they
+got right or wrong. Same version-aware and anti-slop bars apply: the model
+answer must be correct for the pinned version, and specific rather than
+generic.
 
 Explicitly deferred past v1 (not dropped, just not v1 scope): code
 quality/idiom-fit scoring (e.g. stale React 17 habits inside React 19 code)
