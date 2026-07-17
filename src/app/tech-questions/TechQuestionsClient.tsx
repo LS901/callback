@@ -41,7 +41,7 @@ export function TechQuestionsClient() {
     const newTechId = event.target.value;
     const tech = techOptions.find((t) => t.id === newTechId) ?? techOptions[0];
     setTechId(newTechId);
-    setVersion(tech.versions[0]);
+    setVersion(tech.versions[0] ?? '');
   }
 
   function handleGenerateQuestion() {
@@ -88,7 +88,7 @@ export function TechQuestionsClient() {
         Tech Questions
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Scenario-based questions, grounded in the version you pick.
+        Scenario-based questions — pick a technology and version, or go general.
       </Typography>
 
       {error && (
@@ -100,13 +100,8 @@ export function TechQuestionsClient() {
       {phase === 'picker' && (
         <Stack spacing={2} sx={{ maxWidth: 360 }}>
           <FormControl fullWidth>
-            <InputLabel id="tech-label">Technology</InputLabel>
-            <Select
-              labelId="tech-label"
-              label="Technology"
-              value={techId}
-              onChange={handleTechChange}
-            >
+            <InputLabel id="tech-label">Topic</InputLabel>
+            <Select labelId="tech-label" label="Topic" value={techId} onChange={handleTechChange}>
               {techOptions.map((tech) => (
                 <MenuItem key={tech.id} value={tech.id}>
                   {tech.label}
@@ -114,21 +109,23 @@ export function TechQuestionsClient() {
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth>
-            <InputLabel id="version-label">Version</InputLabel>
-            <Select
-              labelId="version-label"
-              label="Version"
-              value={version}
-              onChange={(event) => setVersion(event.target.value)}
-            >
-              {selectedTech.versions.map((v) => (
-                <MenuItem key={v} value={v}>
-                  {v}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {selectedTech.versions.length > 0 && (
+            <FormControl fullWidth>
+              <InputLabel id="version-label">Version</InputLabel>
+              <Select
+                labelId="version-label"
+                label="Version"
+                value={version}
+                onChange={(event) => setVersion(event.target.value)}
+              >
+                {selectedTech.versions.map((v) => (
+                  <MenuItem key={v} value={v}>
+                    {v}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
           <Button variant="contained" onClick={handleGenerateQuestion} disabled={isPending}>
             {isPending ? <CircularProgress size={20} /> : 'Generate question'}
           </Button>
@@ -140,7 +137,7 @@ export function TechQuestionsClient() {
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
-                {selectedTech.label} {version}
+                {version ? `${selectedTech.label} ${version}` : selectedTech.label}
               </Typography>
               <Typography variant="h6" gutterBottom>
                 {question.title}

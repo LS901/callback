@@ -4,6 +4,9 @@ export type TechOption = {
   versions: string[];
 };
 
+/** Sentinel id for "general engineering judgment" — not tied to any language/framework/version. */
+export const GENERAL_TOPIC_ID = 'general';
+
 /**
  * Curated, not exhaustive — v1 scope is JS/TS/React/Next.js only (spec §3).
  * Review periodically; the generation prompt still grounds itself via live
@@ -14,4 +17,5 @@ export const techOptions: TechOption[] = [
   { id: 'typescript', label: 'TypeScript', versions: ['5.9', '5.6', '5.4'] },
   { id: 'react', label: 'React', versions: ['19', '18'] },
   { id: 'nextjs', label: 'Next.js', versions: ['16', '15', '14'] },
+  { id: GENERAL_TOPIC_ID, label: 'General Engineering', versions: [] },
 ];
